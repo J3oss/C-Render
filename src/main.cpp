@@ -5,8 +5,6 @@
 #include <window.h>
 #include <renderer.h>
 
-#define WIDTH 800
-#define HEIGHT 800
 
 
 int main()
@@ -14,7 +12,7 @@ int main()
   SDL_Event event;
   int quit = 0;
 
-  Renderer renderer(WIDTH, HEIGHT);
+  Renderer& renderer = Renderer::GetInstance();
 
   while( !quit )
   {

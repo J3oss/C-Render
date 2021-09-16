@@ -1,3 +1,6 @@
+#define WIDTH 800
+#define HEIGHT 800
+
 #include <renderer.h>
 
 #define abs(x) (x > 0 ? x:-1 * x)

@@ -10,9 +10,10 @@
 class Renderer
 {
 public:
-  Renderer(uint32_t width,uint32_t height)
+  static Renderer& GetInstance()
   {
-    _window = Window("C-Render", width, height);
+    static Renderer instance;
+    return instance;
   }
 
   void Update();
@@ -20,6 +21,10 @@ public:
   void SetScene(uint32_t sceneIndex);
 
 private:
+  Renderer();
+  Renderer(Renderer const&);
+  void operator=(Renderer const&);
+
   Window _window;
 
   uint32_t _scene_index = 0;
