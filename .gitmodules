@@ -1,3 +1,6 @@
 [submodule "ext/SDL"]
 	path = ext/SDL
 	url = https://github.com/libsdl-org/SDL
+[submodule "ext/assimp"]
+	path = ext/assimp
+	url = https://github.com/assimp/assimp
