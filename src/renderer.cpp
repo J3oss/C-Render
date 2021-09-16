@@ -17,7 +17,58 @@ union FPint
   };
 };
 
-void Renderer::DrawLine(Point &p1, Point &p2, Color c)
+void Renderer::Update()
+{
+  DrawScene();
+  _window.Update();
+}
+
+void Renderer::SetScene(uint32_t sceneIndex)
+{
+  _scene_index = sceneIndex;
+}
+
+Renderer::Renderer()
+{
+  _window = Window("C-Render", WIDTH, HEIGHT);
+}
+
+void Renderer::DrawScene()
+{
+  Scene s = _scenes[_scene_index];
+
+  for (size_t objIndex = 0; objIndex < s.objects.size(); objIndex++) {
+    DrawObject(objIndex);
+  }
+}
+
+void Renderer::DrawObject(uint32_t _object_index)
+{
+  //remove this later
+  Color white(255, 255, 255);
+  Object o = _scenes[_scene_index].objects[_object_index];
+
+  //draw mesh
+  for (size_t index = 0; index < o.mesh._index_count; index+=3) {
+    uint32_t p1Index = o.mesh._indices[index];
+    uint32_t p2Index = o.mesh._indices[index+1];
+    uint32_t p3Index = o.mesh._indices[index+2];
+
+    DrawTriangle(o.mesh._vertices[p1Index],
+                 o.mesh._vertices[p2Index],
+                 o.mesh._vertices[p3Index],
+                 white);
+  }
+}
+
+void Renderer::DrawTriangle(Point p1, Point p2, Point p3, Color c)
+{
+  DrawLine(p1, p2, c);
+  DrawLine(p2, p3, c);
+  DrawLine(p3, p1, c);
+}
+
+void Renderer::DrawLine(Point p1, Point p2, Color c)
 {
   Point d;
   d = p2 - p1;
@@ -60,9 +111,4 @@ void Renderer::DrawLine(Point &p1, Point &p2, Color c)
       _window.SetPixel(p, c);
     }
   }
-}
-
-void Renderer::Update()
-{
-  _window.Update();
 }
