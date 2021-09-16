@@ -1,4 +1,5 @@
 #include <vector>
+#pragma once
 
 #include <object.h>
 
