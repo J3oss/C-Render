@@ -1,9 +1,19 @@
-#include <vector>
 #pragma once
 
+#include <ext/assimp/include/assimp/Importer.hpp>
+#include <ext/assimp/include/assimp/scene.h>
+#include <ext/assimp/include/assimp/postprocess.h>
+
+#include <vector>
+#include <string>
 #include <object.h>
 
 class Scene {
 public:
-  std::vector<Object> objects;
+  Scene(std::string scenePath);
+
+  static std::vector<Scene> _scenes;
+  std::vector<Object> _objects;
+private:
+  Scene() {}
 };
