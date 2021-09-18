@@ -11,7 +11,7 @@ int main()
   SDL_Event event;
   int quit = 0;
 
-  Renderer& renderer = Renderer::GetInstance();
+  Renderer renderer;
 
   Scene headScene("res/africanhead.obj");
   Scene cubeScene("res/Cube.gltf");

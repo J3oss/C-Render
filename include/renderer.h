@@ -10,20 +10,12 @@
 class Renderer
 {
 public:
-  static Renderer& GetInstance()
-  {
-    static Renderer instance;
-    return instance;
-  }
+  Renderer();
 
   void Update();
   void SetScene(uint32_t sceneIndex);
 
 private:
-  Renderer();
-  Renderer(Renderer const&);
-  void operator=(Renderer const&);
-
   Window _window;
   uint32_t _scene_index = 0;
 
