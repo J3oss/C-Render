@@ -1,7 +1,6 @@
-#define WIDTH 800
-#define HEIGHT 800
-
 #include <renderer.h>
+
+#include <var.h>
 
 #define abs(x) (x > 0 ? x:-1 * x)
 union FPint
@@ -33,14 +32,14 @@ void Renderer::SetScene(uint32_t sceneIndex)
 
 Renderer::Renderer()
 {
-  _window = Window("C-Render", WIDTH, HEIGHT);
+  _window = Window("C-Render", WIDTH+1, HEIGHT+1);
 }
 
 void Renderer::DrawScene()
 {
-  Scene s = _scenes[_scene_index];
+  Scene s = Scene::_scenes[_scene_index];
 
-  for (size_t objIndex = 0; objIndex < s.objects.size(); objIndex++) {
+  for (size_t objIndex = 0; objIndex < s._objects.size(); objIndex++) {
     DrawObject(objIndex);
   }
 }
@@ -49,10 +48,10 @@ void Renderer::DrawObject(uint32_t _object_index)
 {
   //remove this later
   Color white(255, 255, 255);
-  Object o = _scenes[_scene_index].objects[_object_index];
+  Object o = Scene::_scenes[_scene_index]._objects[_object_index];
 
   //draw mesh
-  for (size_t index = 0; index < o.mesh._index_count; index+=3) {
+  for (size_t index = 0; index < o.mesh._indices.size(); index+=3) {
     uint32_t p1Index = o.mesh._indices[index];
     uint32_t p2Index = o.mesh._indices[index+1];
     uint32_t p3Index = o.mesh._indices[index+2];
@@ -76,41 +75,40 @@ void Renderer::DrawLine(Point p1, Point p2, Color c)
   Point d;
   d = p2 - p1;
 
+  if (d.x == 0 && d.y ==0)
+    return;
+
   if (abs(d.x) > abs(d.y))
   {
-    if (p1.x > p2.x) {
+    if (p1.x > p2.x)
       Point::Swap(p1, p2);
-    }
 
     FPint y;
     y.i = p1.y<<16;
 
-    int32_t m = ((int32_t)(p2.y - p1.y)<<16)/(p2.x - p1.x);
+    int32_t m = ((int32_t)(d.y)<<16)/(d.x);
 
     Point p;
     for (size_t x = p1.x; x <= p2.x; x++, y.i+=m)
     {
-      p.x = x;
-      p.y = y.hi;
+      p.x = x; p.y = y.hi;
       _window.SetPixel(p, c);
     }
   }
   else
   {
-    if (p1.y > p2.y) {
+    if (p1.y > p2.y)
       Point::Swap(p1, p2);
-    }
 
     FPint x;
     x.i = p1.x<<16;
 
-    int32_t m = ((int32_t)(p2.x - p1.x)<<16)/(p2.y - p1.y);
+    int32_t m = ((int32_t)(d.x)<<16)/(d.y);
 
     Point p;
     for (size_t y = p1.y; y <= p2.y; y++, x.i+=m)
     {
-      p.x = x.hi;
-      p.y = y;
+      p.x = x.hi; p.y = y;
       _window.SetPixel(p, c);
     }
   }

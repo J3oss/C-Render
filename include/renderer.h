@@ -17,7 +17,6 @@ public:
   }
 
   void Update();
-
   void SetScene(uint32_t sceneIndex);
 
 private:
@@ -26,9 +25,7 @@ private:
   void operator=(Renderer const&);
 
   Window _window;
-
   uint32_t _scene_index = 0;
-  std::vector<Scene> _scenes;
 
   void DrawScene();
 

@@ -4,8 +4,7 @@
 
 #include <window.h>
 #include <renderer.h>
-
-
+#include <scene.h>
 
 int main()
 {
@@ -14,9 +13,12 @@ int main()
 
   Renderer& renderer = Renderer::GetInstance();
 
+  Scene headScene("res/africanhead.obj");
+  Scene cubeScene("res/Cube.gltf");
+
   while( !quit )
   {
-    //renderer.Update();
+    renderer.Update();
 
     while( SDL_PollEvent( &event ) )
     {
