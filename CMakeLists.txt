@@ -9,7 +9,8 @@ add_executable(C-Render
 	src/main.cpp
 	src/window.cpp
 	src/renderer.cpp
-	src/point.cpp)
+	src/point.cpp
+	src/scene.cpp)
 
 target_link_libraries(C-Render 
 	SDL2
