@@ -21,13 +21,10 @@ union FPint
 
 void Renderer::Update()
 {
-  DrawScene();
   _window.Update();
 }
 
-void Renderer::SetScene(uint32_t sceneIndex)
 {
-  _scene_index = sceneIndex;
 }
 
 Renderer::Renderer()
@@ -35,20 +32,18 @@ Renderer::Renderer()
   _window = Window("C-Render", WIDTH+1, HEIGHT+1);
 }
 
-void Renderer::DrawScene()
+void Renderer::DrawScene(std::shared_ptr<Scene> scene)
 {
-  Scene s = Scene::_scenes[_scene_index];
-
-  for (size_t objIndex = 0; objIndex < s._objects.size(); objIndex++) {
-    DrawObject(objIndex);
+  for (size_t objIndex = 0; objIndex < scene->_objects.size(); objIndex++) {
+    DrawObject(scene, objIndex);
   }
 }
 
-void Renderer::DrawObject(uint32_t _object_index)
+void Renderer::DrawObject(std::shared_ptr<Scene> scene, uint32_t _object_index)
 {
   //remove this later
   Color white(255, 255, 255);
-  Object o = Scene::_scenes[_scene_index]._objects[_object_index];
+  Object o = scene->_objects[_object_index];
 
   //draw mesh
   for (size_t index = 0; index < o.mesh._indices.size(); index+=3) {

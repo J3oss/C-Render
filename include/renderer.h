@@ -13,15 +13,12 @@ public:
   Renderer();
 
   void Update();
-  void SetScene(uint32_t sceneIndex);
+  void DrawScene(std::shared_ptr<Scene> scene);
 
 private:
   Window _window;
-  uint32_t _scene_index = 0;
 
-  void DrawScene();
-
-  void DrawObject(uint32_t _object_index);
+  void DrawObject(std::shared_ptr<Scene> scene, uint32_t _object_index);
 
   void DrawTriangle(Point p1, Point p2, Point p3, Color c);
 
