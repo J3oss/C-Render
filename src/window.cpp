@@ -1,5 +1,7 @@
 #include <window.h>
 
+#include <iostream>
+
 Window::Window(const std::string window_name, uint32_t width,uint32_t height)
 {
   SDL_Init(SDL_INIT_VIDEO);
@@ -39,4 +41,9 @@ void Window::SetPixel(Point p, Color c)
     return;
   }
   _pixels[pxCoordinate] = SDL_MapRGB(_temp_surface->format, c.r, c.g, c.b);
+}
+
+void Window::Clear()
+{
+  SDL_FillRect(_temp_surface, NULL, 0x000000);
 }

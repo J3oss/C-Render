@@ -17,6 +17,8 @@ public:
 
   void SetPixel(Point p, Color c);
 
+  void Clear();
+
 private:
   uint32_t* _pixels;
 

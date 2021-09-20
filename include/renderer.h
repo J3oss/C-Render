@@ -6,6 +6,7 @@
 #include <scene.h>
 
 #include <vector>
+#include <memory>
 
 class Renderer
 {
@@ -14,6 +15,7 @@ public:
 
   void Update();
   void DrawScene(std::shared_ptr<Scene> scene);
+  void Clear();
 
 private:
   Window _window;

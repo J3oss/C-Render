@@ -19,17 +19,19 @@ union FPint
   };
 };
 
+Renderer::Renderer()
+{
+  _window = Window("C-Render", WIDTH+1, HEIGHT+1);
+}
+
 void Renderer::Update()
 {
   _window.Update();
 }
 
+void Renderer::Clear()
 {
-}
-
-Renderer::Renderer()
-{
-  _window = Window("C-Render", WIDTH+1, HEIGHT+1);
+  _window.Clear();
 }
 
 void Renderer::DrawScene(std::shared_ptr<Scene> scene)
