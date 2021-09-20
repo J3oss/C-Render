@@ -10,12 +10,13 @@ add_executable(C-Render
 	src/window.cpp
 	src/renderer.cpp
 	src/point.cpp
-	src/scene.cpp)
+	src/scene.cpp
+	src/scene_manager.cpp)
 
-target_link_libraries(C-Render 
+target_link_libraries(C-Render
 	SDL2
 	assimp)
-	
+
 target_include_directories(C-Render PUBLIC
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}/include)

@@ -9,8 +9,6 @@
 
 #include <mesh.h>
 
-std::vector<Scene> Scene::_scenes;
-
 Scene::Scene(std::string scenePath)
 {
   Assimp::Importer importer;
@@ -21,8 +19,6 @@ Scene::Scene(std::string scenePath)
     std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
     return;
   }
-
-  Scene s;
 
   for(unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
   {
@@ -40,16 +36,14 @@ Scene::Scene(std::string scenePath)
       object.mesh._indices.push_back(I3);
     }
 
+    Point p;
     for (size_t vertexIndex = 0; vertexIndex < aimesh->mNumVertices; vertexIndex++)
     {
-      Point p( (aimesh->mVertices[vertexIndex].x + 1.0) * WIDTH/2,
-               (aimesh->mVertices[vertexIndex].y + 1.0) * HEIGHT/2,
-              aimesh->mVertices[vertexIndex].z);
+      p.x = (aimesh->mVertices[vertexIndex].x + 1.0) * WIDTH/2;
+      p.y = (aimesh->mVertices[vertexIndex].y + 1.0) * HEIGHT/2;
 
       object.mesh._vertices.push_back(p);
     }
-    s._objects.push_back(object);
+    _objects.push_back(object);
   }
-
-  _scenes.push_back(s);
 }

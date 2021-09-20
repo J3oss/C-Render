@@ -12,7 +12,6 @@ class Scene {
 public:
   Scene(std::string scenePath);
 
-  static std::vector<Scene> _scenes;
   std::vector<Object> _objects;
 private:
   Scene() {}
