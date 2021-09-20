@@ -5,19 +5,29 @@
 #include <window.h>
 #include <renderer.h>
 #include <scene.h>
+#include <scene_manager.h>
 
 int main()
 {
   SDL_Event event;
   int quit = 0;
 
-  Renderer renderer;
+  SceneManager sceneManager;
 
-  Scene headScene("res/africanhead.obj");
-  Scene cubeScene("res/Cube.gltf");
+  auto headScene = new Scene("res/africanhead.obj");
+  std::shared_ptr<Scene> pHeadScene(headScene);
+  sceneManager.AddScene(pHeadScene);
+
+  auto cubeScene = new Scene("res/Cube.gltf");
+  std::shared_ptr<Scene> pCubeScene(cubeScene);
+  sceneManager.AddScene(pCubeScene);
+
+  Renderer renderer;
 
   while( !quit )
   {
+    renderer.Clear();
+    renderer.DrawScene(sceneManager.GetScene(0));
     renderer.Update();
 
     while( SDL_PollEvent( &event ) )
@@ -34,6 +44,5 @@ int main()
     }
   }
 
-  printf("closing\n");
   SDL_Quit();
 }
