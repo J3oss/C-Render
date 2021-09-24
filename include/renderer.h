@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <memory>
+#include <ext/glm/glm/glm.hpp>
 
 class Renderer
 {
@@ -17,8 +18,10 @@ public:
   void DrawScene(std::shared_ptr<Scene> scene);
   void Clear();
 
+  void SetViewPort(int x, int y);
 private:
   Window _window;
+  glm::mat4 mViewPort;
 
   void DrawObject(std::shared_ptr<Scene> scene, uint32_t _object_index);
 
