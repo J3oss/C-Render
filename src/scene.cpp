@@ -12,38 +12,54 @@
 Scene::Scene(std::string scenePath)
 {
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(scenePath, aiProcess_Triangulate | aiProcess_FlipUVs);
+  auto aiScene = importer.ReadFile(scenePath, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-  if(scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+  if(aiScene == nullptr || aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiScene->mRootNode)
   {
     std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
     return;
   }
 
-  for(unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+  Camera c;
+  mCameras.push_back(c);
+  mActiveCameraIndex = 0;
+
+  for (size_t cameraIndex = 0; cameraIndex < aiScene->mNumCameras; cameraIndex++)
+  {
+    auto aiCamera = aiScene->mCameras[cameraIndex];
+
+    //TODO process cameras from scene
+    Camera c;
+    mCameras.push_back(c);
+  }
+
+  for(unsigned int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++)
   {
     Object object;
-    aiMesh *aimesh = scene->mMeshes[meshIndex];
+    auto aiMesh = aiScene->mMeshes[meshIndex];
 
-    for(unsigned int faceIndex = 0; faceIndex < aimesh->mNumFaces; faceIndex++)
+    for(unsigned int faceIndex = 0; faceIndex < aiMesh->mNumFaces; faceIndex++)
     {
-      uint32_t I1 = aimesh->mFaces[faceIndex].mIndices[0];
-      uint32_t I2 = aimesh->mFaces[faceIndex].mIndices[1];
-      uint32_t I3 = aimesh->mFaces[faceIndex].mIndices[2];
+      uint32_t I1 = aiMesh->mFaces[faceIndex].mIndices[0];
+      uint32_t I2 = aiMesh->mFaces[faceIndex].mIndices[1];
+      uint32_t I3 = aiMesh->mFaces[faceIndex].mIndices[2];
 
-      object.mesh._indices.push_back(I1);
-      object.mesh._indices.push_back(I2);
-      object.mesh._indices.push_back(I3);
+      object.mesh.mIndices.push_back(I1);
+      object.mesh.mIndices.push_back(I2);
+      object.mesh.mIndices.push_back(I3);
     }
 
-    Point p;
-    for (size_t vertexIndex = 0; vertexIndex < aimesh->mNumVertices; vertexIndex++)
+    glm::vec4 pos;
+    for (size_t vertexIndex = 0; vertexIndex < aiMesh->mNumVertices; vertexIndex++)
     {
-      p.x = (aimesh->mVertices[vertexIndex].x + 1.0) * WIDTH/2;
-      p.y = (aimesh->mVertices[vertexIndex].y + 1.0) * HEIGHT/2;
+      pos.x = aiMesh->mVertices[vertexIndex].x;
+      pos.y = aiMesh->mVertices[vertexIndex].y;
+      pos.z = aiMesh->mVertices[vertexIndex].z;
+      pos.w = 1;
 
-      object.mesh._vertices.push_back(p);
+      object.mesh.mPositions.push_back(pos);
     }
-    _objects.push_back(object);
+
+    mObjects.push_back(object);
   }
 }

@@ -7,12 +7,16 @@
 #include <vector>
 #include <string>
 #include <object.h>
+#include <camera.h>
 
 class Scene {
 public:
   Scene(std::string scenePath);
 
-  std::vector<Object> _objects;
+  uint32_t mActiveCameraIndex;
+
+  std::vector<Object> mObjects;
+  std::vector<Camera> mCameras;
 private:
   Scene() {}
 };
