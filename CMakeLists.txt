@@ -4,6 +4,7 @@ project(C-Render)
 
 add_subdirectory(ext/SDL)
 add_subdirectory(ext/assimp)
+add_subdirectory(ext/glm)
 
 add_executable(C-Render
 	src/main.cpp
@@ -11,11 +12,13 @@ add_executable(C-Render
 	src/renderer.cpp
 	src/point.cpp
 	src/scene.cpp
-	src/scene_manager.cpp)
+	src/scene_manager.cpp
+	src/camera.cpp)
 
 target_link_libraries(C-Render
 	SDL2
-	assimp)
+	assimp
+	glm)
 
 target_include_directories(C-Render PUBLIC
 	${PROJECT_SOURCE_DIR}
