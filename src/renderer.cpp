@@ -55,14 +55,12 @@ void Renderer::DrawObject(std::shared_ptr<Scene> scene, uint32_t _object_index)
     uint32_t p2Index = o.mesh.mIndices[index+1];
     uint32_t p3Index = o.mesh.mIndices[index+2];
 
-    scene->mCameras[scene->mActiveCameraIndex].mWorld_Tranform[3].z = -5.0f;
+    scene->mCameras[scene->mActiveCameraIndex]->UpdateView();
+    scene->mCameras[scene->mActiveCameraIndex]->UpdateVP();
 
-    scene->mCameras[scene->mActiveCameraIndex].UpdateView();
-    scene->mCameras[scene->mActiveCameraIndex].UpdateVP();
-
-    glm::vec4 ss1 = mViewPort * scene->mCameras[scene->mActiveCameraIndex].mProjection * scene->mCameras[scene->mActiveCameraIndex].mView * o.mesh.mPositions[p1Index];
-    glm::vec4 ss2 = mViewPort * scene->mCameras[scene->mActiveCameraIndex].mProjection * scene->mCameras[scene->mActiveCameraIndex].mView * o.mesh.mPositions[p2Index];
-    glm::vec4 ss3 = mViewPort * scene->mCameras[scene->mActiveCameraIndex].mProjection * scene->mCameras[scene->mActiveCameraIndex].mView * o.mesh.mPositions[p3Index];
+    glm::vec4 ss1 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * o.mesh.mPositions[p1Index];
+    glm::vec4 ss2 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * o.mesh.mPositions[p2Index];
+    glm::vec4 ss3 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * o.mesh.mPositions[p3Index];
 
     Point p1(ss1.x/ss1.w, ss1.y/ss1.w, ss1.z/ss1.w);
     Point p2(ss2.x/ss2.w, ss2.y/ss2.w, ss2.z/ss2.w);

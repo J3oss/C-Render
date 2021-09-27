@@ -14,17 +14,17 @@ int main()
 
   SceneManager sceneManager;
 
-  auto headScene = new Scene("res/africanhead.obj");
-  std::shared_ptr<Scene> pHeadScene(headScene);
-  sceneManager.AddScene(pHeadScene);
-  //
+  // auto headScene = new Scene("res/africanhead.obj");
+  // std::shared_ptr<Scene> pHeadScene(headScene);
+  // sceneManager.AddScene(pHeadScene);
+
   // auto cubeScene = new Scene("res/Cube.gltf");
   // std::shared_ptr<Scene> pCubeScene(cubeScene);
   // sceneManager.AddScene(pCubeScene);
 
-  // auto headwithcameraScene = new Scene("res/headwithcamera.glb");
-  // std::shared_ptr<Scene> pheadwithcameraScene(headwithcameraScene);
-  // sceneManager.AddScene(pheadwithcameraScene);
+  auto headwithcameraScene = new Scene("res/headwithcamera.gltf");
+  std::shared_ptr<Scene> pheadwithcameraScene(headwithcameraScene);
+  sceneManager.AddScene(pheadwithcameraScene);
 
   // auto cubeplaneScene = new Scene("res/cube&plane.glb");
   // std::shared_ptr<Scene> pCubePlane(cubeplaneScene);
