@@ -53,35 +53,35 @@ Scene::Scene(std::string scenePath)
 
   ProcessAssimpCameras(aiScene);
 
-  for(unsigned int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++)
-  {
-    Object object;
-    auto aiMesh = aiScene->mMeshes[meshIndex];
-
-    for(unsigned int faceIndex = 0; faceIndex < aiMesh->mNumFaces; faceIndex++)
-    {
-      uint32_t I1 = aiMesh->mFaces[faceIndex].mIndices[0];
-      uint32_t I2 = aiMesh->mFaces[faceIndex].mIndices[1];
-      uint32_t I3 = aiMesh->mFaces[faceIndex].mIndices[2];
-
-      object.mesh.mIndices.push_back(I1);
-      object.mesh.mIndices.push_back(I2);
-      object.mesh.mIndices.push_back(I3);
-    }
-
-    glm::vec4 pos;
-    for (size_t vertexIndex = 0; vertexIndex < aiMesh->mNumVertices; vertexIndex++)
-    {
-      pos.x = aiMesh->mVertices[vertexIndex].x;
-      pos.y = aiMesh->mVertices[vertexIndex].y;
-      pos.z = aiMesh->mVertices[vertexIndex].z;
-      pos.w = 1;
-
-      object.mesh.mPositions.push_back(pos);
-    }
-
-    mObjects.push_back(object);
-  }
+//   for(unsigned int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++)
+//   {
+//     Object object;
+//     auto aiMesh = aiScene->mMeshes[meshIndex];
+//
+//     for(unsigned int faceIndex = 0; faceIndex < aiMesh->mNumFaces; faceIndex++)
+//     {
+//       uint32_t I1 = aiMesh->mFaces[faceIndex].mIndices[0];
+//       uint32_t I2 = aiMesh->mFaces[faceIndex].mIndices[1];
+//       uint32_t I3 = aiMesh->mFaces[faceIndex].mIndices[2];
+//
+//       object.mesh.mIndices.push_back(I1);
+//       object.mesh.mIndices.push_back(I2);
+//       object.mesh.mIndices.push_back(I3);
+//     }
+//
+//     glm::vec4 pos;
+//     for (size_t vertexIndex = 0; vertexIndex < aiMesh->mNumVertices; vertexIndex++)
+//     {
+//       pos.x = aiMesh->mVertices[vertexIndex].x;
+//       pos.y = aiMesh->mVertices[vertexIndex].y;
+//       pos.z = aiMesh->mVertices[vertexIndex].z;
+//       pos.w = 1;
+//
+//       object.mesh.mPositions.push_back(pos);
+//     }
+//
+//     mObjects.push_back(object);
+//   }
 }
 
 void Scene::ProcessAssimpCameras(const aiScene* aiScene)

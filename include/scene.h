@@ -6,10 +6,10 @@
 
 #include <vector>
 #include <string>
-#include <object.h>
 #include <camera.h>
 #include <node.h>
 #include <memory>
+#include <mesh.h>
 
 class Scene {
 public:
@@ -20,7 +20,7 @@ public:
   uint32_t mActiveCameraIndex = 0;
   std::vector< std::shared_ptr<Camera> > mCameras;
 
-  std::vector<Object> mObjects;
+  std::vector<Mesh> mMeshes;
 
 private:
   std::shared_ptr<Node> FindNode(std::shared_ptr<Node> node, std::string name);
