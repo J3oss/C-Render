@@ -3,10 +3,11 @@
 #include <ext/glm/glm/glm.hpp>
 #include <ext/glm/glm/gtc/matrix_transform.hpp>
 
-class Camera {
-public:
-  glm::mat4 mWorld_Tranform;
+#include <node.h>
+#include <memory>
 
+class Camera : public Node {
+public:
   glm::mat4 mVP;
 
   glm::mat4 mProjection;
