@@ -9,6 +9,35 @@
 
 #include <mesh.h>
 
+#include <ext/glm/glm/glm.hpp>
+
+glm::mat4 ConvertAssimpToGlmMat(aiMatrix4x4 aiMat)
+{
+  glm::mat4 mat;
+
+  mat[0].x = aiMat[0][0];
+  mat[1].x = aiMat[0][1];
+  mat[2].x = aiMat[0][2];
+  mat[3].x = aiMat[0][3];
+
+  mat[0].y = aiMat[1][0];
+  mat[1].y = aiMat[1][1];
+  mat[2].y = aiMat[1][2];
+  mat[3].y = aiMat[1][3];
+
+  mat[0].z = aiMat[2][0];
+  mat[1].z = aiMat[2][1];
+  mat[2].z = aiMat[2][2];
+  mat[3].z = aiMat[2][3];
+
+  mat[0].w = aiMat[3][0];
+  mat[1].w = aiMat[3][1];
+  mat[2].w = aiMat[3][2];
+  mat[3].w = aiMat[3][3];
+
+  return mat;
+}
+
 Scene::Scene(std::string scenePath)
 {
   Assimp::Importer importer;
@@ -23,6 +52,7 @@ Scene::Scene(std::string scenePath)
   Camera c;
   mCameras.push_back(c);
   mActiveCameraIndex = 0;
+  mRootNode = ProcessAssimpNode(aiScene->mRootNode ,nullptr);
 
   for (size_t cameraIndex = 0; cameraIndex < aiScene->mNumCameras; cameraIndex++)
   {
@@ -62,4 +92,37 @@ Scene::Scene(std::string scenePath)
 
     mObjects.push_back(object);
   }
+}
+std::shared_ptr<Node> Scene::ProcessAssimpNode(aiNode* aiNode, std::shared_ptr<Node> parent)
+{
+  auto node = new Node();
+  node->SetParent(parent);
+  node->SetName(aiNode->mName.C_Str());
+  node->SetLocalTransform(ConvertAssimpToGlmMat(aiNode->mTransformation));
+
+  std::shared_ptr<Node> pNode(node);
+  for (size_t childIndex = 0; childIndex < aiNode->mNumChildren; childIndex++)
+  {
+    auto c = ProcessAssimpNode(aiNode->mChildren[childIndex], pNode);
+    std::shared_ptr<Node> pChild(c);
+    node->AddChild(pChild);
+  }
+
+  return pNode;
+}
+
+std::shared_ptr<Node> Scene::FindNode(std::shared_ptr<Node> node, std::string name)
+{
+  if (node->GetName().compare(name) == 0)
+    return node;
+
+  std::shared_ptr<Node> foundNode = nullptr;
+  for (size_t childIndex = 0; childIndex < node->mChildren.size(); childIndex++)
+  {
+    foundNode = FindNode(node->mChildren[childIndex], name);
+    if (foundNode != nullptr)
+      break;
+  }
+
+  return foundNode;
 }
