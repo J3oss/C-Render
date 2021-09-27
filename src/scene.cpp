@@ -49,19 +49,9 @@ Scene::Scene(std::string scenePath)
     return;
   }
 
-  Camera c;
-  mCameras.push_back(c);
-  mActiveCameraIndex = 0;
   mRootNode = ProcessAssimpNode(aiScene->mRootNode ,nullptr);
 
-  for (size_t cameraIndex = 0; cameraIndex < aiScene->mNumCameras; cameraIndex++)
-  {
-    auto aiCamera = aiScene->mCameras[cameraIndex];
-
-    //TODO process cameras from scene
-    Camera c;
-    mCameras.push_back(c);
-  }
+  ProcessAssimpCameras(aiScene);
 
   for(unsigned int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++)
   {
@@ -93,6 +83,51 @@ Scene::Scene(std::string scenePath)
     mObjects.push_back(object);
   }
 }
+
+void Scene::ProcessAssimpCameras(const aiScene* aiScene)
+{
+  if (!aiScene->HasCameras())
+  {
+    //new camera
+    auto newCamera = new Camera();
+    newCamera->SetName( "DefaultCamera" );
+    newCamera->SetParent( mRootNode );
+
+    glm::mat4 transform = glm::mat4(1.0);
+    transform[2].z *= -1.0f;
+    newCamera->SetLocalTransform( transform );
+
+    //replacing pointers
+    std::shared_ptr<Node> cameraNode(newCamera);
+    mRootNode->AddChild(cameraNode);
+    mCameras.push_back( std::static_pointer_cast<Camera>(cameraNode));
+  }
+
+  for (size_t cameraIndex = 0; cameraIndex < aiScene->mNumCameras; cameraIndex++)
+  {
+    //assimp camera
+    auto aiCamera = aiScene->mCameras[cameraIndex];
+    float aiFov = aiCamera->mHorizontalFOV;
+    float aiAspect = aiCamera->mAspect;
+    float aiNear = aiCamera->mClipPlaneNear;
+    float aiFar = aiCamera->mClipPlaneFar;
+
+    //scene graph camera node
+    auto cameraNode = FindNode(mRootNode, aiCamera->mName.C_Str());
+
+    //new camera to replace the scene graph camera node
+    auto newCamera = new Camera(aiFov, 1.0f, aiNear, aiFar);
+    newCamera->SetName( aiCamera->mName.C_Str() );
+    newCamera->SetParent( cameraNode->GetParent() );
+    newCamera->SetLocalTransform( cameraNode->GetLocalTransform() );
+    newCamera->mChildren = std::move(cameraNode->mChildren);
+
+    //replacing pointers
+    cameraNode.reset(newCamera);
+    mCameras.push_back( std::static_pointer_cast<Camera>(cameraNode));
+  }
+}
+
 std::shared_ptr<Node> Scene::ProcessAssimpNode(aiNode* aiNode, std::shared_ptr<Node> parent)
 {
   auto node = new Node();

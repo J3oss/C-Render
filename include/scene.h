@@ -15,13 +15,15 @@ class Scene {
 public:
   Scene(std::string scenePath);
 
-  uint32_t mActiveCameraIndex;
   std::shared_ptr<Node> mRootNode;
 
+  uint32_t mActiveCameraIndex = 0;
+  std::vector< std::shared_ptr<Camera> > mCameras;
+
   std::vector<Object> mObjects;
-  std::vector<Camera> mCameras;
+
 private:
-  Scene() {}
   std::shared_ptr<Node> FindNode(std::shared_ptr<Node> node, std::string name);
   std::shared_ptr<Node> ProcessAssimpNode(aiNode* aiNode, std::shared_ptr<Node> parent);
+  void ProcessAssimpCameras(const aiScene* aiScene);
 };
