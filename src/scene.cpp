@@ -49,39 +49,9 @@ Scene::Scene(std::string scenePath)
     return;
   }
 
-  mRootNode = ProcessAssimpNode(aiScene->mRootNode ,nullptr);
+  mRootNode = ProcessAssimpNode(aiScene, aiScene->mRootNode ,nullptr);
 
   ProcessAssimpCameras(aiScene);
-
-//   for(unsigned int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++)
-//   {
-//     Object object;
-//     auto aiMesh = aiScene->mMeshes[meshIndex];
-//
-//     for(unsigned int faceIndex = 0; faceIndex < aiMesh->mNumFaces; faceIndex++)
-//     {
-//       uint32_t I1 = aiMesh->mFaces[faceIndex].mIndices[0];
-//       uint32_t I2 = aiMesh->mFaces[faceIndex].mIndices[1];
-//       uint32_t I3 = aiMesh->mFaces[faceIndex].mIndices[2];
-//
-//       object.mesh.mIndices.push_back(I1);
-//       object.mesh.mIndices.push_back(I2);
-//       object.mesh.mIndices.push_back(I3);
-//     }
-//
-//     glm::vec4 pos;
-//     for (size_t vertexIndex = 0; vertexIndex < aiMesh->mNumVertices; vertexIndex++)
-//     {
-//       pos.x = aiMesh->mVertices[vertexIndex].x;
-//       pos.y = aiMesh->mVertices[vertexIndex].y;
-//       pos.z = aiMesh->mVertices[vertexIndex].z;
-//       pos.w = 1;
-//
-//       object.mesh.mPositions.push_back(pos);
-//     }
-//
-//     mObjects.push_back(object);
-//   }
 }
 
 void Scene::ProcessAssimpCameras(const aiScene* aiScene)
@@ -97,7 +67,7 @@ void Scene::ProcessAssimpCameras(const aiScene* aiScene)
     transform[2].z *= -1.0f;
     newCamera->SetLocalTransform( transform );
 
-    //replacing pointers
+    //adding new node
     std::shared_ptr<Node> cameraNode(newCamera);
     mRootNode->AddChild(cameraNode);
     mCameras.push_back( std::static_pointer_cast<Camera>(cameraNode));
@@ -128,7 +98,43 @@ void Scene::ProcessAssimpCameras(const aiScene* aiScene)
   }
 }
 
-std::shared_ptr<Node> Scene::ProcessAssimpNode(aiNode* aiNode, std::shared_ptr<Node> parent)
+void Scene::ProcessAssimpMesh(aiMesh* aiMesh, std::shared_ptr<Node> parentNode)
+{
+  auto newmesh = new Mesh();
+
+  for(unsigned int faceIndex = 0; faceIndex < aiMesh->mNumFaces; faceIndex++)
+  {
+    uint32_t I1 = aiMesh->mFaces[faceIndex].mIndices[0];
+    uint32_t I2 = aiMesh->mFaces[faceIndex].mIndices[1];
+    uint32_t I3 = aiMesh->mFaces[faceIndex].mIndices[2];
+
+    newmesh->mIndices.push_back(I1);
+    newmesh->mIndices.push_back(I2);
+    newmesh->mIndices.push_back(I3);
+  }
+
+  glm::vec4 pos;
+  for (size_t vertexIndex = 0; vertexIndex < aiMesh->mNumVertices; vertexIndex++)
+  {
+    pos.x = aiMesh->mVertices[vertexIndex].x;
+    pos.y = aiMesh->mVertices[vertexIndex].y;
+    pos.z = aiMesh->mVertices[vertexIndex].z;
+    pos.w = 1;
+
+    newmesh->mPositions.push_back(pos);
+  }
+
+  newmesh->SetName( "mesh" );
+  newmesh->SetParent( parentNode );
+  newmesh->SetLocalTransform( glm::mat4(1.0) );
+
+  //adding new node
+  std::shared_ptr<Node> meshNode(newmesh);
+  parentNode->AddChild(meshNode);
+  mMeshes.push_back( std::static_pointer_cast<Mesh>(meshNode));
+}
+
+std::shared_ptr<Node> Scene::ProcessAssimpNode(const aiScene* aiScene, aiNode* aiNode, std::shared_ptr<Node> parent)
 {
   auto node = new Node();
   node->SetParent(parent);
@@ -136,9 +142,15 @@ std::shared_ptr<Node> Scene::ProcessAssimpNode(aiNode* aiNode, std::shared_ptr<N
   node->SetLocalTransform(ConvertAssimpToGlmMat(aiNode->mTransformation));
 
   std::shared_ptr<Node> pNode(node);
+
+  for (size_t meshIndex = 0; meshIndex < aiNode->mNumMeshes; meshIndex++)
+  {
+    ProcessAssimpMesh(aiScene->mMeshes[aiNode->mMeshes[meshIndex]], pNode);
+  }
+
   for (size_t childIndex = 0; childIndex < aiNode->mNumChildren; childIndex++)
   {
-    auto c = ProcessAssimpNode(aiNode->mChildren[childIndex], pNode);
+    auto c = ProcessAssimpNode(aiScene, aiNode->mChildren[childIndex], pNode);
     std::shared_ptr<Node> pChild(c);
     node->AddChild(pChild);
   }

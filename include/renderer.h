@@ -23,7 +23,7 @@ private:
   Window _window;
   glm::mat4 mViewPort;
 
-  void DrawObject(std::shared_ptr<Scene> scene, uint32_t _object_index);
+  void DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex);
 
   void DrawTriangle(Point p1, Point p2, Point p3, Color c);
 

@@ -20,10 +20,12 @@ public:
   uint32_t mActiveCameraIndex = 0;
   std::vector< std::shared_ptr<Camera> > mCameras;
 
-  std::vector<Mesh> mMeshes;
+  std::vector< std::shared_ptr<Mesh> > mMeshes;
 
 private:
   std::shared_ptr<Node> FindNode(std::shared_ptr<Node> node, std::string name);
-  std::shared_ptr<Node> ProcessAssimpNode(aiNode* aiNode, std::shared_ptr<Node> parent);
+  std::shared_ptr<Node> ProcessAssimpNode(const aiScene* aiScene, aiNode* aiNode, std::shared_ptr<Node> parent);
+
   void ProcessAssimpCameras(const aiScene* aiScene);
+  void ProcessAssimpMesh(aiMesh* aiMesh, std::shared_ptr<Node> parentNode);
 };

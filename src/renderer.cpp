@@ -38,39 +38,39 @@ void Renderer::Clear()
 
 void Renderer::DrawScene(std::shared_ptr<Scene> scene)
 {
-  // for (size_t objIndex = 0; objIndex < scene->mObjects.size(); objIndex++) {
-  //   DrawObject(scene, objIndex);
-  // }
+  for (size_t meshIndex = 0; meshIndex < scene->mMeshes.size(); meshIndex++) {
+    DrawMesh(scene, meshIndex);
+  }
 }
 
-void Renderer::DrawObject(std::shared_ptr<Scene> scene, uint32_t _object_index)
+void Renderer::DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex)
 {
-  // //remove this later
-  // Color white(255, 255, 255);
-  // Object o = scene->mObjects[_object_index];
-  //
-  // //draw mesh
-  // for (size_t index = 0; index < o.mesh.mIndices.size(); index+=3) {
-  //   uint32_t p1Index = o.mesh.mIndices[index];
-  //   uint32_t p2Index = o.mesh.mIndices[index+1];
-  //   uint32_t p3Index = o.mesh.mIndices[index+2];
-  //
-  //   scene->mCameras[scene->mActiveCameraIndex]->UpdateView();
-  //   scene->mCameras[scene->mActiveCameraIndex]->UpdateVP();
-  //
-  //   glm::vec4 ss1 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * o.mesh.mPositions[p1Index];
-  //   glm::vec4 ss2 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * o.mesh.mPositions[p2Index];
-  //   glm::vec4 ss3 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * o.mesh.mPositions[p3Index];
-  //
-  //   Point p1(ss1.x/ss1.w, ss1.y/ss1.w, ss1.z/ss1.w);
-  //   Point p2(ss2.x/ss2.w, ss2.y/ss2.w, ss2.z/ss2.w);
-  //   Point p3(ss3.x/ss3.w, ss3.y/ss3.w, ss3.z/ss3.w);
-  //
-  //   DrawTriangle(p1,
-  //                p2,
-  //                p3,
-  //                white);
-  // }
+  //remove this later
+  Color white(255, 255, 255);
+  auto m = scene->mMeshes[meshIndex];
+
+  //draw mesh
+  for (size_t index = 0; index < m->mIndices.size(); index+=3) {
+    uint32_t p1Index = m->mIndices[index];
+    uint32_t p2Index = m->mIndices[index+1];
+    uint32_t p3Index = m->mIndices[index+2];
+
+    scene->mCameras[scene->mActiveCameraIndex]->UpdateView();
+    scene->mCameras[scene->mActiveCameraIndex]->UpdateVP();
+
+    glm::vec4 ss1 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * m->GetGlobalTransform() * m->mPositions[p1Index];
+    glm::vec4 ss2 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * m->GetGlobalTransform() * m->mPositions[p2Index];
+    glm::vec4 ss3 = mViewPort * scene->mCameras[scene->mActiveCameraIndex]->mVP * m->GetGlobalTransform() * m->mPositions[p3Index];
+
+    Point p1(ss1.x/ss1.w, ss1.y/ss1.w, ss1.z/ss1.w);
+    Point p2(ss2.x/ss2.w, ss2.y/ss2.w, ss2.z/ss2.w);
+    Point p3(ss3.x/ss3.w, ss3.y/ss3.w, ss3.z/ss3.w);
+
+    DrawTriangle(p1,
+                 p2,
+                 p3,
+                 white);
+  }
 }
 
 void Renderer::DrawTriangle(Point p1, Point p2, Point p3, Color c)
