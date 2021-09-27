@@ -13,7 +13,8 @@ add_executable(C-Render
 	src/point.cpp
 	src/scene.cpp
 	src/scene_manager.cpp
-	src/camera.cpp)
+	src/camera.cpp
+	src/node.cpp)
 
 target_link_libraries(C-Render
 	SDL2
