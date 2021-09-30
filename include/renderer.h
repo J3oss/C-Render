@@ -25,7 +25,9 @@ private:
 
   void DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex);
 
-  void DrawTriangle(Point p1, Point p2, Point p3, Color c);
+  void DrawTriangle(glm::ivec3 p1, glm::ivec3 p2, glm::ivec3 p3);
 
-  void DrawLine(Point p1, Point p2, Color c);
+  void DrawTriangleSolid(glm::ivec3 x, glm::ivec3 y, glm::vec3 z, float intensity);
+
+  void DrawLine(glm::ivec2 p1, glm::ivec2 p2, Color c);
 };
