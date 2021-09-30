@@ -4,7 +4,6 @@
 
 #include <string>
 
-#include <point.h>
 #include <color.h>
 
 class Window
@@ -15,7 +14,7 @@ public:
 
   void Update();
 
-  void SetPixel(Point p, Color c);
+  void SetPixel(uint32_t x, uint32_t y, Color c);
 
   void Clear();
 

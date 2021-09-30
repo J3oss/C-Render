@@ -1,7 +1,6 @@
 #pragma once
 
 #include <window.h>
-#include <point.h>
 #include <color.h>
 #include <scene.h>
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <point.h>
 
 #include <ext/glm/glm/glm.hpp>
 

@@ -32,10 +32,10 @@ void Window::Update()
   SDL_UpdateWindowSurface(_window);
 }
 
-void Window::SetPixel(Point p, Color c)
+void Window::SetPixel(uint32_t x, uint32_t y, Color c)
 {
   //image is flipped horrizontally
-  uint32_t pxCoordinate = p.x + (_temp_surface->h -1 - p.y) * _temp_surface->w;
+  uint32_t pxCoordinate = x + (_temp_surface->h -1 - y) * _temp_surface->w;
   if (pxCoordinate > _temp_surface->h * _temp_surface->w) {
     printf("erro pxCoordinate out of range\n");
     return;

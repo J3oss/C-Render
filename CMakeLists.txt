@@ -10,7 +10,6 @@ add_executable(C-Render
 	src/main.cpp
 	src/window.cpp
 	src/renderer.cpp
-	src/point.cpp
 	src/scene.cpp
 	src/scene_manager.cpp
 	src/camera.cpp
