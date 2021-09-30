@@ -19,4 +19,6 @@ public:
   void UpdateView();
 
   void UpdateVP();
+
+  glm::vec3 GetLookAt();
 };

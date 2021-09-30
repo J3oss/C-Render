@@ -27,3 +27,9 @@ void Camera::UpdateVP()
 {
   mVP = mProjection * mView;
 }
+
+glm::vec3 Camera::GetLookAt()
+{
+  glm::mat4 transfom = GetGlobalTransform();
+  return glm::vec3(transfom[2].x, transfom[2].y, transfom[2].z);
+}
