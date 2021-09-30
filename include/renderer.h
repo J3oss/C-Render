@@ -19,6 +19,7 @@ public:
 
   void SetViewPort(int x, int y);
 private:
+  float* zBuffer;
   Window _window;
   glm::mat4 mViewPort;
 

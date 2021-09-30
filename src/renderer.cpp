@@ -24,6 +24,10 @@ union FPint
 Renderer::Renderer()
 {
   _window = Window("C-Render", WIDTH+1, HEIGHT+1);
+  zBuffer = new float[WIDTH*HEIGHT];
+  for (size_t i = 0; i < WIDTH*HEIGHT; i++) {
+    zBuffer[i] = std::numeric_limits<float>::max();
+  }
 }
 
 void Renderer::Update()
