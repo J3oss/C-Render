@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
+# SET(CMAKE_CXX_FLAGS "-fsanitize=address")
+# SET(CFLAGS "-fsanitize=address")
+# SET(LDFLAGS "-fsanitize=address")
+
+set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+
 project(C-Render)
 
 add_subdirectory(ext/SDL)
