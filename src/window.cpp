@@ -45,5 +45,6 @@ void Window::SetPixel(uint32_t x, uint32_t y, Color c)
 
 void Window::Clear()
 {
+  SDL_FillRect(_surface, NULL, 0x000000);
   SDL_FillRect(_temp_surface, NULL, 0x000000);
 }

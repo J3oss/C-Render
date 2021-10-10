@@ -7,7 +7,19 @@ void SceneManager::AddScene(std::shared_ptr<Scene> scene)
   mScenes.push_back(scene);
 }
 
-std::shared_ptr<Scene> SceneManager::GetScene(uint32_t sceneIndex)
+void SceneManager::NextActiveScene()
 {
-  return mScenes[sceneIndex];
+  mActiveSceneIndex++;
+
+  mActiveSceneIndex %= mScenes.size();
+}
+
+void SceneManager::SetActiveScene(uint32_t index)
+{
+  mActiveSceneIndex = index;
+}
+
+std::shared_ptr<Scene> SceneManager::GetActiveScene()
+{
+  return mScenes[mActiveSceneIndex];
 }
