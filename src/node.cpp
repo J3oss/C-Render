@@ -54,5 +54,22 @@ glm::mat4 Node::GetGlobalTransform()
   return mGlobalTransform;
 }
 
+void Node::Scale(glm::vec3 delta)
 {
+  mScale.x *= delta.x;
+  mScale.y *= delta.y;
+  mScale.z *= delta.z;
+}
+void Node::Rotate(glm::vec3 delta)
+{
+  glm::quat q = glm::quat(delta);
+
+  glm::mat4 temp = glm::toMat4(q) * mRotation;
+  mRotation = temp;
+}
+void Node::Translate(glm::vec3 delta)
+{
+  mTranslation.x += delta.x;
+  mTranslation.y += delta.y;
+  mTranslation.z += delta.z;
 }

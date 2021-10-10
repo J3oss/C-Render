@@ -27,11 +27,18 @@ public:
 
   glm::mat4 GetGlobalTransform();
 
+  void Scale(glm::vec3 delta);
+  void Rotate(glm::vec3 delta);
+  void Translate(glm::vec3 delta);
 private:
   std::string mName;
 
 
   std::weak_ptr<Node> mParent;
+
+  glm::vec3 mScale;
+  glm::mat4 mRotation;
+  glm::vec3 mTranslation;
   glm::mat4 mLocalTransform;
 
   glm::mat4 mGlobalTransform;
