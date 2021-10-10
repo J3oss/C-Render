@@ -11,6 +11,10 @@
 
 #include <ext/glm/glm/glm.hpp>
 
+#include <textures/texture.h>
+#include <textures/solid_texture.h>
+#include <textures/image_texture.h>
+
 glm::mat4 ConvertAssimpToGlmMat(aiMatrix4x4 aiMat)
 {
   glm::mat4 mat;
@@ -52,6 +56,56 @@ Scene::Scene(std::string scenePath)
   mRootNode = ProcessAssimpNode(aiScene, aiScene->mRootNode ,nullptr);
 
   ProcessAssimpCameras(aiScene);
+}
+
+void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
+{
+  if (!aiScene->HasMaterials())
+    return;
+
+  for (size_t materialIndex = 0; materialIndex < aiScene->mNumMaterials; materialIndex++)
+  {
+    auto newMaterial = std::make_shared<Material>();
+
+    printf("Material Number: %ld\n", materialIndex);
+    auto aiMaterial = aiScene->mMaterials[materialIndex];
+
+    aiString matName;
+    aiMaterial->Get(AI_MATKEY_NAME, matName);
+    printf("Material Name: %s\n", matName.C_Str());
+    newMaterial->mName = std::string(matName.C_Str());
+
+    aiString texPath;
+    if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_DIFFUSE , 0), texPath) == AI_SUCCESS )
+    {
+      printf("found deffuse\n" );
+      aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, materialIndex), texPath);
+      printf("Material Path: %s\n", texPath.C_Str());
+
+      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::DIFFUSE);
+      newMaterial->mAlbedoTexture = newTexture;
+    }
+    else
+    {
+      aiColor3D baseColor;
+      aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, baseColor);
+
+      auto newTexture = std::make_shared<SolidTexture>(255*baseColor.r, 255*baseColor.g, 255*baseColor.b);
+      newMaterial->mAlbedoTexture = newTexture;
+    }
+
+    if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_NORMALS , 0), texPath) == AI_SUCCESS )
+    {
+      aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, materialIndex), texPath);
+      printf("Material Path: %s\n", texPath.C_Str());
+
+      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::NORMAL);
+      newMaterial->mNormalTexture = newTexture;
+    }
+
+    mMaterials.push_back( newMaterial );
+    printf("\n");
+  }
 }
 
 void Scene::ProcessAssimpCameras(const aiScene* aiScene)
@@ -140,22 +194,45 @@ std::shared_ptr<Node> Scene::ProcessAssimpNode(const aiScene* aiScene, aiNode* a
   node->SetParent(parent);
   node->SetName(aiNode->mName.C_Str());
   node->SetLocalTransform(ConvertAssimpToGlmMat(aiNode->mTransformation));
-
-  std::shared_ptr<Node> pNode(node);
-
-  for (size_t meshIndex = 0; meshIndex < aiNode->mNumMeshes; meshIndex++)
+  glm::vec4 norm;
+  for (size_t normalIndex = 0; normalIndex < aiMesh->mNumVertices; normalIndex++)
   {
-    ProcessAssimpMesh(aiScene->mMeshes[aiNode->mMeshes[meshIndex]], pNode);
+    norm.x = aiMesh->mNormals[normalIndex].x;
+    norm.y = aiMesh->mNormals[normalIndex].y;
+    norm.z = aiMesh->mNormals[normalIndex].z;
+    norm.w = 0;
+
+    newmesh->mNormals.push_back(norm);
   }
 
-  for (size_t childIndex = 0; childIndex < aiNode->mNumChildren; childIndex++)
+  glm::vec4 tang;
+  for (size_t tangentIndex = 0; tangentIndex < aiMesh->mNumVertices; tangentIndex++)
   {
-    auto c = ProcessAssimpNode(aiScene, aiNode->mChildren[childIndex], pNode);
-    std::shared_ptr<Node> pChild(c);
-    node->AddChild(pChild);
+    tang.x = aiMesh->mNormals[tangentIndex].x;
+    tang.y = aiMesh->mNormals[tangentIndex].y;
+    tang.z = aiMesh->mNormals[tangentIndex].z;
+    tang.w = 0;
+
+    newmesh->mTangets.push_back(tang);
   }
 
-  return pNode;
+  if (aiMesh->GetNumUVChannels() > 0)
+  {
+    glm::vec2 uv;
+    for (size_t uvIndex = 0; uvIndex < aiMesh->mNumVertices; uvIndex++)
+    {
+      uv.x = aiMesh->mTextureCoords[0][uvIndex].x;
+      uv.y = aiMesh->mTextureCoords[0][uvIndex].y;
+
+      newmesh->mUVs.push_back(uv);
+    }
+  }
+
+  newmesh->mMaterial = mMaterials[aiMesh->mMaterialIndex];
+
+  newmesh->SetName( std::string("mesh") );
+  newmesh->SetParent( parentNode );
+  newmesh->SetLocalTransform( glm::mat4(1.0) );
 }
 
 std::shared_ptr<Node> Scene::FindNode(std::shared_ptr<Node> node, std::string name)

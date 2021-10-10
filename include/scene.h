@@ -10,6 +10,7 @@
 #include <node.h>
 #include <memory>
 #include <mesh.h>
+#include <material.h>
 
 class Scene {
 public:
@@ -22,10 +23,13 @@ public:
 
   std::vector< std::shared_ptr<Mesh> > mMeshes;
 
+  std::vector< std::shared_ptr<Material> > mMaterials;
+
 private:
   std::shared_ptr<Node> FindNode(std::shared_ptr<Node> node, std::string name);
   std::shared_ptr<Node> ProcessAssimpNode(const aiScene* aiScene, aiNode* aiNode, std::shared_ptr<Node> parent);
 
   void ProcessAssimpCameras(const aiScene* aiScene);
+  void ProcessAssimpMaterials(const aiScene* aiScene);
   void ProcessAssimpMesh(aiMesh* aiMesh, std::shared_ptr<Node> parentNode);
 };
