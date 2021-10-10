@@ -8,27 +8,30 @@
 
 class Node
 {
-
 public:
-  std::vector< std::shared_ptr<Node> > mChildren;
-
   Node() {}
 
-  void SetName(const char* name);
-  void SetParent(std::shared_ptr<Node> parent);
-  void SetLocalTransform(glm::mat4 localTransform);
+  std::vector< std::shared_ptr<Node> > mChildren;
 
   std::string GetName();
-  std::shared_ptr<Node> GetParent();
-  glm::mat4 GetLocalTransform();
-  glm::mat4 GetGlobalTransform();
+  void SetName(std::string name);
 
   void AddChild(std::shared_ptr<Node> child);
+  // std::vector<Node>& GetChildren();
+
+  std::shared_ptr<Node> GetParent();
+  void SetParent(std::weak_ptr<Node> parent);
+
+  glm::mat4 GetLocalTransform();
+  void SetLocalTransform(glm::mat4 localTransform);
+
+  glm::mat4 GetGlobalTransform();
+
 private:
   std::string mName;
 
-  std::shared_ptr<Node> mParent;
 
+  std::weak_ptr<Node> mParent;
   glm::mat4 mLocalTransform;
 
   glm::mat4 mGlobalTransform;

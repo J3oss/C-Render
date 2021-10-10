@@ -1,48 +1,58 @@
 #include <node.h>
-
-void Node::SetName(const char* name)
-{
-  mName = std::string(name);
-}
-
-void Node::SetParent(std::shared_ptr<Node> parent)
-{
-  mParent = parent;
-}
-
-void Node::SetLocalTransform(glm::mat4 localTransform)
-{
-  mLocalTransform = localTransform;
-  mDirtyGlobalTransform = true;
-}
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 std::string Node::GetName()
 {
   return mName;
 }
+void Node::SetName(std::string name)
+{
+  mName = name;
+}
+
+void Node::AddChild(std::shared_ptr<Node> child)
+{
+  mChildren.push_back(child);
+}
+
+// std::vector<Node>& Node::GetChildren()
+// {
+//   return mChildren;
+// }
 
 std::shared_ptr<Node> Node::GetParent()
 {
-  return mParent;
+  std::shared_ptr<Node> p = mParent.lock();
+  return p;
+}
+void Node::SetParent(std::weak_ptr<Node> parent)
+{
+  mParent = parent;
 }
 
 glm::mat4 Node::GetLocalTransform()
 {
   return mLocalTransform;
 }
+void Node::SetLocalTransform(glm::mat4 localTransform)
+{
+  mLocalTransform = localTransform;
+  mDirtyGlobalTransform = true;
+}
 
 glm::mat4 Node::GetGlobalTransform()
 {
+  std::shared_ptr<Node> p = mParent.lock();
+
   if (mDirtyGlobalTransform)
   {
-    mGlobalTransform = mParent == nullptr ? mLocalTransform : mParent->GetGlobalTransform() * mLocalTransform;
+    mGlobalTransform = p == nullptr ? mLocalTransform : p->GetGlobalTransform() * mLocalTransform;
     mDirtyGlobalTransform = false;
   }
 
   return mGlobalTransform;
 }
 
-void Node::AddChild(std::shared_ptr<Node> child)
 {
-  mChildren.push_back(child);
 }

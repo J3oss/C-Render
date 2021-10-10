@@ -27,7 +27,7 @@ public:
 
 private:
   std::shared_ptr<Node> FindNode(std::shared_ptr<Node> node, std::string name);
-  std::shared_ptr<Node> ProcessAssimpNode(const aiScene* aiScene, aiNode* aiNode, std::shared_ptr<Node> parent);
+  std::shared_ptr<Node> ProcessAssimpNodes(const aiScene* aiScene, aiNode* aiNode, std::weak_ptr<Node> parent);
 
   void ProcessAssimpCameras(const aiScene* aiScene);
   void ProcessAssimpMaterials(const aiScene* aiScene);

@@ -53,9 +53,26 @@ Scene::Scene(std::string scenePath)
     return;
   }
 
-  mRootNode = ProcessAssimpNode(aiScene, aiScene->mRootNode ,nullptr);
-
+  ProcessAssimpMaterials(aiScene);
+  mRootNode = ProcessAssimpNodes(aiScene, aiScene->mRootNode, mRootNode);
   ProcessAssimpCameras(aiScene);
+}
+
+std::shared_ptr<Node> Scene::ProcessAssimpNodes(const aiScene* aiScene, aiNode* aiNode, std::weak_ptr<Node> parent)
+{
+  auto node = std::make_shared<Node>();
+
+  node->SetParent(parent);
+  node->SetName(aiNode->mName.C_Str());
+  node->SetLocalTransform(ConvertAssimpToGlmMat(aiNode->mTransformation));
+
+  for (size_t meshIndex = 0; meshIndex < aiNode->mNumMeshes; meshIndex++)
+    ProcessAssimpMesh(aiScene->mMeshes[aiNode->mMeshes[meshIndex]], node->GetParent());
+
+  for (size_t childIndex = 0; childIndex < aiNode->mNumChildren; childIndex++)
+    node->AddChild(ProcessAssimpNodes(aiScene, aiNode->mChildren[childIndex], node));
+
+  return node;
 }
 
 void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
@@ -113,8 +130,8 @@ void Scene::ProcessAssimpCameras(const aiScene* aiScene)
   if (!aiScene->HasCameras())
   {
     //new camera
-    auto newCamera = new Camera();
-    newCamera->SetName( "DefaultCamera" );
+    auto newCamera = std::make_shared<Camera>();
+    newCamera->SetName( std::string("DefaultCamera") );
     newCamera->SetParent( mRootNode );
 
     glm::mat4 transform = glm::mat4(1.0);
@@ -122,9 +139,8 @@ void Scene::ProcessAssimpCameras(const aiScene* aiScene)
     newCamera->SetLocalTransform( transform );
 
     //adding new node
-    std::shared_ptr<Node> cameraNode(newCamera);
-    mRootNode->AddChild(cameraNode);
-    mCameras.push_back( std::static_pointer_cast<Camera>(cameraNode));
+    mRootNode->AddChild(newCamera);
+    mCameras.push_back(newCamera);
   }
 
   for (size_t cameraIndex = 0; cameraIndex < aiScene->mNumCameras; cameraIndex++)
@@ -137,24 +153,24 @@ void Scene::ProcessAssimpCameras(const aiScene* aiScene)
     float aiFar = aiCamera->mClipPlaneFar;
 
     //scene graph camera node
-    auto cameraNode = FindNode(mRootNode, aiCamera->mName.C_Str());
+    auto cameraNode = FindNode(mRootNode, std::string(aiCamera->mName.C_Str()));
 
     //new camera to replace the scene graph camera node
-    auto newCamera = new Camera(aiFov, 1.0f, aiNear, aiFar);
-    newCamera->SetName( aiCamera->mName.C_Str() );
+    auto newCamera = std::make_shared<Camera>(aiFov, 1.0f, aiNear, aiFar);
+    newCamera->SetName( std::string(std::string(aiCamera->mName.C_Str())) );
     newCamera->SetParent( cameraNode->GetParent() );
     newCamera->SetLocalTransform( cameraNode->GetLocalTransform() );
     newCamera->mChildren = std::move(cameraNode->mChildren);
 
     //replacing pointers
-    cameraNode.reset(newCamera);
-    mCameras.push_back( std::static_pointer_cast<Camera>(cameraNode));
+    cameraNode = newCamera;
+    mCameras.push_back(newCamera);
   }
 }
 
 void Scene::ProcessAssimpMesh(aiMesh* aiMesh, std::shared_ptr<Node> parentNode)
 {
-  auto newmesh = new Mesh();
+  auto newmesh = std::make_shared<Mesh>();
 
   for(unsigned int faceIndex = 0; faceIndex < aiMesh->mNumFaces; faceIndex++)
   {
@@ -178,22 +194,6 @@ void Scene::ProcessAssimpMesh(aiMesh* aiMesh, std::shared_ptr<Node> parentNode)
     newmesh->mPositions.push_back(pos);
   }
 
-  newmesh->SetName( "mesh" );
-  newmesh->SetParent( parentNode );
-  newmesh->SetLocalTransform( glm::mat4(1.0) );
-
-  //adding new node
-  std::shared_ptr<Node> meshNode(newmesh);
-  parentNode->AddChild(meshNode);
-  mMeshes.push_back( std::static_pointer_cast<Mesh>(meshNode));
-}
-
-std::shared_ptr<Node> Scene::ProcessAssimpNode(const aiScene* aiScene, aiNode* aiNode, std::shared_ptr<Node> parent)
-{
-  auto node = new Node();
-  node->SetParent(parent);
-  node->SetName(aiNode->mName.C_Str());
-  node->SetLocalTransform(ConvertAssimpToGlmMat(aiNode->mTransformation));
   glm::vec4 norm;
   for (size_t normalIndex = 0; normalIndex < aiMesh->mNumVertices; normalIndex++)
   {
@@ -233,6 +233,10 @@ std::shared_ptr<Node> Scene::ProcessAssimpNode(const aiScene* aiScene, aiNode* a
   newmesh->SetName( std::string("mesh") );
   newmesh->SetParent( parentNode );
   newmesh->SetLocalTransform( glm::mat4(1.0) );
+
+  //adding new node
+  parentNode->AddChild(newmesh);
+  mMeshes.push_back(newmesh);
 }
 
 std::shared_ptr<Node> Scene::FindNode(std::shared_ptr<Node> node, std::string name)
