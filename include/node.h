@@ -17,7 +17,6 @@ public:
   void SetName(std::string name);
 
   void AddChild(std::shared_ptr<Node> child);
-  // std::vector<Node>& GetChildren();
 
   std::shared_ptr<Node> GetParent();
   void SetParent(std::weak_ptr<Node> parent);
@@ -30,17 +29,16 @@ public:
   void Scale(glm::vec3 delta);
   void Rotate(glm::vec3 delta);
   void Translate(glm::vec3 delta);
+
 private:
   std::string mName;
 
-
   std::weak_ptr<Node> mParent;
 
-  glm::vec3 mScale;
-  glm::mat4 mRotation;
-  glm::vec3 mTranslation;
   glm::mat4 mLocalTransform;
 
   glm::mat4 mGlobalTransform;
   bool mDirtyGlobalTransform = true;
+
+  void SetDirty();
 };
