@@ -49,7 +49,6 @@ void Renderer::Clear()
 
 void Renderer::DrawScene(std::shared_ptr<Scene> scene)
 {
-
   scene->mCameras[scene->mActiveCameraIndex]->UpdateView();
   scene->mCameras[scene->mActiveCameraIndex]->UpdateVP();
 
@@ -162,7 +161,7 @@ void Renderer::DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex)
 
           glm::vec3 sss = glm::vec3((surfaceNormal.r * 2.0 - 1.0), (surfaceNormal.g * 2.0 - 1.0), (surfaceNormal.b * 2.0 - 1.0));
           glm::vec3 tSurfaceNormal = interpolatedTBN * glm::normalize(sss);
-          float intensity = glm::dot( tSurfaceNormal, lightdir) + 0.2f;
+          float intensity = glm::dot( tSurfaceNormal, lightdir) + 0.6f;
           intensity = CLAMP(intensity, 0.0f, 1.0f);
           diffuse.r *=intensity; diffuse.g *=intensity; diffuse.b *=intensity;
           Color Debug = Color((uint32_t)(tSurfaceNormal.r*255), (uint32_t)(tSurfaceNormal.g*255), (uint32_t)(tSurfaceNormal.b*255), 255);

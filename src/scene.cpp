@@ -44,6 +44,8 @@ glm::mat4 ConvertAssimpToGlmMat(aiMatrix4x4 aiMat)
 
 Scene::Scene(std::string scenePath)
 {
+  printf("Importing Scene: %s\n", scenePath.c_str());
+
   Assimp::Importer importer;
   auto aiScene = importer.ReadFile(scenePath, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -89,15 +91,15 @@ void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
 
     aiString matName;
     aiMaterial->Get(AI_MATKEY_NAME, matName);
-    printf("Material Name: %s\n", matName.C_Str());
+    printf("\tMaterial Name: %s\n", matName.C_Str());
     newMaterial->mName = std::string(matName.C_Str());
 
     aiString texPath;
     if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_DIFFUSE , 0), texPath) == AI_SUCCESS )
     {
-      printf("found deffuse\n" );
+      printf("\tFound diffuse map\n" );
       aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, materialIndex), texPath);
-      printf("Material Path: %s\n", texPath.C_Str());
+      printf("\t\tPath: %s\n", texPath.C_Str());
 
       auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::DIFFUSE);
       newMaterial->mAlbedoTexture = newTexture;
@@ -113,8 +115,9 @@ void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
 
     if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_NORMALS , 0), texPath) == AI_SUCCESS )
     {
+      printf("\tFound normal map\n" );
       aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, materialIndex), texPath);
-      printf("Material Path: %s\n", texPath.C_Str());
+      printf("\t\tPath: %s\n", texPath.C_Str());
 
       auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::NORMAL);
       newMaterial->mNormalTexture = newTexture;

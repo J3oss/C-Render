@@ -11,7 +11,7 @@ Image::Image(const char* path, ImageType type)
   {
     std::string fpath = std::string("res/") + std::string(path);
     float* pixels = stbi_loadf(fpath.c_str(), &mWidth, &mHeight, &mChannels, STBI_rgb);
-    printf("%d %d\n", mWidth, mHeight);
+
     if (pixels == nullptr) {
       printf("texture not found\n");
       return;
@@ -33,7 +33,6 @@ Image::Image(const char* path, ImageType type)
   {
     std::string fpath = std::string("res/") + std::string(path);
     stbi_uc* pixels = stbi_load(fpath.c_str(), &mWidth, &mHeight, &mChannels, STBI_rgb);
-    printf("%d %d\n", mWidth, mHeight);
 
     if (pixels == nullptr) {
       printf("texture not found\n");
