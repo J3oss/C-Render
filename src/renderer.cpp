@@ -115,6 +115,7 @@ void Renderer::DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex)
   sh.inCamera = scene->mCameras[scene->mActiveCameraIndex];
 
   sh.mvpMatrix = scene->mCameras[scene->mActiveCameraIndex]->mVP * m->GetGlobalTransform();
+  sh.modelMatrix = m->GetGlobalTransform();
   sh.normalMatrix = glm::transpose(glm::inverse(glm::mat3(m->GetGlobalTransform())));
 
   // #pragma omp parallel for

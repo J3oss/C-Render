@@ -193,7 +193,7 @@ void Scene::ProcessAssimpLights(const aiScene* aiScene)
     newLight->mQuadratic = aiLight->mAttenuationQuadratic;
     newLight->mAmbientColor = glm::vec3(aiLight->mColorAmbient.r, aiLight->mColorAmbient.g, aiLight->mColorAmbient.b);
     newLight->mDiffuseColor = glm::vec3(aiLight->mColorDiffuse.r, aiLight->mColorDiffuse.g, aiLight->mColorDiffuse.b);
-    newLight->mAmbientColor = glm::vec3(aiLight->mColorSpecular.r, aiLight->mColorSpecular.g, aiLight->mColorSpecular.b);
+    newLight->mSpecularColor = glm::vec3(aiLight->mColorSpecular.r, aiLight->mColorSpecular.g, aiLight->mColorSpecular.b);
 
     switch (aiLight->mType)
     {
