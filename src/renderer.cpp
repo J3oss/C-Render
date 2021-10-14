@@ -5,8 +5,19 @@
 
 #include <ext/glm/glm/gtx/scalar_multiplication.hpp>
 
+// #include <shaders/flat_shader.h>
+// FlatShader sh;
+
+// #include <shaders/gouraud_shader.h>
+// GouraudShader sh;
+
+#include <shaders/phong_shader.h>
+PhongShader sh;
+
+// #include <shaders/ggshader.h>
+// FlatShader sh;
+
 #define SWAP(x,y) { glm::ivec2 temp = x; x = y; y = temp;}
-#define CLAMP(x,lo,hi) { x = x < lo ? lo : x > hi ? hi : x}
 
 union FPint
 {
@@ -90,44 +101,40 @@ glm::vec3 barycentric(glm::ivec3 x, glm::ivec3 y, glm::ivec2 p)
     return glm::vec3(1.f-(u.x+u.y)/u.z, u.y/u.z, u.x/u.z);
 }
 
-glm::vec3 lightdir(0.2,0.5,0.8);
 void Renderer::DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex)
 {
   auto m = scene->mMeshes[meshIndex];
-  auto mvp = scene->mCameras[scene->mActiveCameraIndex]->mVP * m->GetGlobalTransform();
-  auto mv = scene->mCameras[scene->mActiveCameraIndex]->mView * m->GetGlobalTransform();
-  auto normalMatrix = glm::transpose(glm::inverse(glm::mat3(m->GetGlobalTransform())));
-  glm::mat3 tbnMatrix[3], interpolatedTBN;
 
-  glm::vec2 uv[3];
-  glm::vec4 worldPos[3], projPos[3];
-  glm::vec3 normal[3], tangent[3], bitangent[3];
+  sh.inPositions = m->mPositions;
+  sh.inNormals = m->mNormals;
+  sh.inTangents = m->mTangets;
+  sh.inUVs = m->mUVs;
+
+  sh.inLights = scene->mLights;
+  sh.inMaterial = m->mMaterial;
+  sh.inCamera = scene->mCameras[scene->mActiveCameraIndex];
+
+  sh.mvpMatrix = scene->mCameras[scene->mActiveCameraIndex]->mVP * m->GetGlobalTransform();
+  sh.normalMatrix = glm::transpose(glm::inverse(glm::mat3(m->GetGlobalTransform())));
+
+  // #pragma omp parallel for
   for (size_t index = 0; index < m->mIndices.size(); index+=3)
   {
-    for (size_t i = 0; i < 3; i++)
-    {
-      worldPos[i] = m->GetGlobalTransform() * m->mPositions[m->mIndices[index+i]];
-      projPos[i] = scene->mCameras[scene->mActiveCameraIndex]->mVP * worldPos[i];
-      uv[i] = m->mUVs[m->mIndices[index+i]];
+    uint32_t indecies[3] = {m->mIndices[index+0], m->mIndices[index+1], m->mIndices[index+2]};
 
-      normal[i] = normalMatrix * m->mNormals[m->mIndices[index+i]];
-      tangent[i] = normalMatrix * m->mTangets[m->mIndices[index+i]];
-      bitangent[i] = cross(normal[i],tangent[i]);
+    sh.vertex(indecies);
 
-      tbnMatrix[i] = glm::mat3(tangent[i], bitangent[i], normal[i]);
-    }
-
-    float det = projPos[0].x * (projPos[1].y - projPos[2].y) +
-                projPos[1].x * (projPos[2].y - projPos[0].y) +
-                projPos[2].x * (projPos[0].y - projPos[1].y);
+    float det = sh.outPositions[0].x * (sh.outPositions[1].y - sh.outPositions[2].y) +
+                sh.outPositions[1].x * (sh.outPositions[2].y - sh.outPositions[0].y) +
+                sh.outPositions[2].x * (sh.outPositions[0].y - sh.outPositions[1].y);
 
     if ( (mCullMode == CullingMode::NONE) ||
          (mCullMode == CullingMode::BACK && det > 0) ||
          (mCullMode == CullingMode::FRONT && det < 0) )
     {
-      glm::vec4 cc1 = mViewPort * projPos[0];
-      glm::vec4 cc2 = mViewPort * projPos[1];
-      glm::vec4 cc3 = mViewPort * projPos[2];
+      glm::vec4 cc1 = mViewPort * sh.outPositions[0];
+      glm::vec4 cc2 = mViewPort * sh.outPositions[1];
+      glm::vec4 cc3 = mViewPort * sh.outPositions[2];
 
       glm::ivec3 x(cc1.x/cc1.w, cc2.x/cc2.w, cc3.x/cc3.w);
       glm::ivec3 y(cc1.y/cc1.w, cc2.y/cc2.w, cc3.y/cc3.w);
@@ -151,21 +158,10 @@ void Renderer::DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex)
           if (bc.x<0 || bc.y<0 || bc.z<0 || zBuffer[p.x + p.y * WIDTH] < pz) continue;
 
           zBuffer[p.x + p.y * WIDTH] = pz;
-          float u = uv[0].x * bc[0] + uv[1].x * bc[1] + uv[2].x * bc[2];
-          float v = uv[0].y * bc[0] + uv[1].y * bc[1] + uv[2].y * bc[2];
 
-          interpolatedTBN = (tbnMatrix[0] * bc[0]) + (tbnMatrix[1] * bc[1]) + (tbnMatrix[2] * bc[2]);
+          Color c = sh.fragment(bc);
 
-          Color surfaceNormal = m->mMaterial->mNormalTexture->value(u,v);
-          Color diffuse = m->mMaterial->mAlbedoTexture->value(u,v);
-
-          glm::vec3 sss = glm::vec3((surfaceNormal.r * 2.0 - 1.0), (surfaceNormal.g * 2.0 - 1.0), (surfaceNormal.b * 2.0 - 1.0));
-          glm::vec3 tSurfaceNormal = interpolatedTBN * glm::normalize(sss);
-          float intensity = glm::dot( tSurfaceNormal, lightdir) + 0.6f;
-          intensity = CLAMP(intensity, 0.0f, 1.0f);
-          diffuse.r *=intensity; diffuse.g *=intensity; diffuse.b *=intensity;
-          Color Debug = Color((uint32_t)(tSurfaceNormal.r*255), (uint32_t)(tSurfaceNormal.g*255), (uint32_t)(tSurfaceNormal.b*255), 255);
-          _window.SetPixel(p.x, p.y, diffuse);
+          _window.SetPixel(p.x, p.y, c);
         }
     }
   }
@@ -173,7 +169,7 @@ void Renderer::DrawMesh(std::shared_ptr<Scene> scene, uint32_t meshIndex)
 
 void Renderer::DrawTriangle(glm::ivec3 p1, glm::ivec3 p2, glm::ivec3 p3)
 {
-  Color white(255, 255, 255, 255);
+  Color white(255, 255, 255);
 
   if (p1.x < WIDTH && p1.y < HEIGHT && p2.x < WIDTH && p2.y < HEIGHT)
     DrawLine(p1, p2, white);
@@ -184,7 +180,6 @@ void Renderer::DrawTriangle(glm::ivec3 p1, glm::ivec3 p2, glm::ivec3 p3)
   if (p3.x < WIDTH && p3.y < HEIGHT && p1.x < WIDTH && p1.y < HEIGHT)
     DrawLine(p3, p1, white);
 }
-
 
 void Renderer::DrawLine(glm::ivec2 p1, glm::ivec2 p2, Color c)
 {

@@ -76,3 +76,7 @@ void Node::SetDirty()
   for (size_t childIndedx = 0; childIndedx < mChildren.size(); childIndedx++)
     mChildren[childIndedx]->SetDirty();
 }
+
+glm::vec3 Node::GetPosition() {
+  return glm::vec3(GetGlobalTransform()[3]);
+}

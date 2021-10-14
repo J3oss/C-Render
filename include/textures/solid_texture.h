@@ -7,7 +7,7 @@ class SolidTexture : public Texture
 public:
   SolidTexture() {}
   SolidTexture(Color c) { mColor = c; }
-  SolidTexture(char r, char g, char b) { mColor = Color(r,g,b, 255); }
+  SolidTexture(float r, float g, float b) { mColor = Color(r,g,b); }
 
   virtual Color value(float u, float v) const override { return mColor; }
 

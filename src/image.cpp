@@ -20,9 +20,9 @@ Image::Image(const char* path, ImageType type)
     Color c;
     for (size_t pixelIndex = 0; pixelIndex < mWidth*mHeight*mChannels ; pixelIndex+=mChannels)
     {
-      c.r = pixels[pixelIndex];
-      c.g = pixels[pixelIndex+1];
-      c.b = pixels[pixelIndex+2];
+      c.mColor.x = pixels[pixelIndex];
+      c.mColor.y = pixels[pixelIndex+1];
+      c.mColor.z = pixels[pixelIndex+2];
 
       mPixels.push_back(c);
     }
@@ -43,10 +43,9 @@ Image::Image(const char* path, ImageType type)
     for (size_t pixelIndex = 0; pixelIndex < mWidth*mHeight*mChannels; pixelIndex+=mChannels
     )
     {
-      c.r = pixels[pixelIndex];
-      c.g = pixels[pixelIndex+1];
-      c.b = pixels[pixelIndex+2];
-      // c.a = pixels[pixelIndex+3];
+      c.mColor.x = pixels[pixelIndex];
+      c.mColor.y = pixels[pixelIndex+1];
+      c.mColor.z = pixels[pixelIndex+2];
 
       mPixels.push_back(c);
     }

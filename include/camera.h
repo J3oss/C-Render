@@ -1,10 +1,8 @@
 #pragma once
 
-#include <ext/glm/glm/glm.hpp>
 #include <ext/glm/glm/gtc/matrix_transform.hpp>
 
 #include <node.h>
-#include <memory>
 
 class Camera : public Node {
 public:

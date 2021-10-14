@@ -1,17 +1,25 @@
 #pragma once
 
+#include <ext/glm/glm/glm.hpp>
+
 class Color
 {
 public:
-  float r, g, b, a;
+
+  glm::vec3 mColor;
 
   Color()
   {
-    r = 0;  g = 0;  b = 0; a = 0;
+    mColor = glm::vec3(0,0,0);
   }
 
-  Color(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
+  Color(uint32_t R, uint32_t G, uint32_t B)
   {
-    r = R;  g = G;  b = B; a = A;
+    mColor = glm::vec3(R,G,B);
+  }
+
+  Color(glm::vec3 color)
+  {
+    mColor = glm::vec3(color);
   }
 };

@@ -26,6 +26,8 @@ public:
 
   glm::mat4 GetGlobalTransform();
 
+  glm::vec3 GetPosition();
+
   void Scale(glm::vec3 delta);
   void Rotate(glm::vec3 delta);
   void Translate(glm::vec3 delta);

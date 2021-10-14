@@ -5,5 +5,5 @@
 class Texture
 {
 public:
-	virtual Color value(float u, float v) const { return Color(255,255,255,255); }
+	virtual Color value(float u, float v) const { return Color(255,255,255); }
 };
