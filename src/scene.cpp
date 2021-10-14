@@ -15,6 +15,8 @@
 #include <textures/solid_texture.h>
 #include <textures/image_texture.h>
 
+#include <glm/gtx/matrix_decompose.hpp>
+
 glm::mat4 ConvertAssimpToGlmMat(aiMatrix4x4 aiMat)
 {
   glm::mat4 mat;
@@ -57,7 +59,11 @@ Scene::Scene(std::string scenePath)
 
   ProcessAssimpMaterials(aiScene);
   mRootNode = ProcessAssimpNodes(aiScene, aiScene->mRootNode, mRootNode);
+
+  ProcessAssimpLights(aiScene);
   ProcessAssimpCameras(aiScene);
+
+  printf("\n");
 }
 
 std::shared_ptr<Node> Scene::ProcessAssimpNodes(const aiScene* aiScene, aiNode* aiNode, std::weak_ptr<Node> parent)
@@ -86,21 +92,18 @@ void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
   {
     auto newMaterial = std::make_shared<Material>();
 
-    printf("Material Number: %ld\n", materialIndex);
+    printf("  Material Number: %ld\n", materialIndex);
     auto aiMaterial = aiScene->mMaterials[materialIndex];
 
     aiString matName;
     aiMaterial->Get(AI_MATKEY_NAME, matName);
-    printf("\tMaterial Name: %s\n", matName.C_Str());
+    printf("    Material Name: %s\n", matName.C_Str());
     newMaterial->mName = std::string(matName.C_Str());
 
     aiString texPath;
     if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_DIFFUSE , 0), texPath) == AI_SUCCESS )
     {
-      printf("\tFound diffuse map\n" );
       aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, materialIndex), texPath);
-      printf("\t\tPath: %s\n", texPath.C_Str());
-
       auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::DIFFUSE);
       newMaterial->mAlbedoTexture = newTexture;
     }
@@ -115,16 +118,12 @@ void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
 
     if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_NORMALS , 0), texPath) == AI_SUCCESS )
     {
-      printf("\tFound normal map\n" );
       aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, materialIndex), texPath);
-      printf("\t\tPath: %s\n", texPath.C_Str());
-
       auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::NORMAL);
       newMaterial->mNormalTexture = newTexture;
     }
 
     mMaterials.push_back( newMaterial );
-    printf("\n");
   }
 }
 
@@ -168,6 +167,43 @@ void Scene::ProcessAssimpCameras(const aiScene* aiScene)
     //replacing pointers
     cameraNode = newCamera;
     mCameras.push_back(newCamera);
+  }
+}
+
+void Scene::ProcessAssimpLights(const aiScene* aiScene)
+{
+  for (size_t lightIndex = 0; lightIndex < aiScene->mNumLights; lightIndex++)
+  {
+    //assimp light
+    auto aiLight = aiScene->mLights[lightIndex];
+
+    //scene graph light node
+    auto lightNode = FindNode(mRootNode, std::string(aiLight->mName.C_Str()));
+
+    //new light to replace the scene graph node
+    auto newLight = std::make_shared<Light>();
+    newLight->SetName( std::string(std::string(aiLight->mName.C_Str())) );
+    newLight->SetParent( lightNode->GetParent() );
+    newLight->SetLocalTransform( lightNode->GetLocalTransform() );
+    newLight->mChildren = std::move(lightNode->mChildren);
+
+    newLight->mDirection = glm::vec4(lightNode->GetGlobalTransform()[2]);
+    newLight->mConstant = aiLight->mAttenuationConstant;
+    newLight->mLinear = aiLight->mAttenuationLinear;
+    newLight->mQuadratic = aiLight->mAttenuationQuadratic;
+    newLight->mAmbientColor = glm::vec3(aiLight->mColorAmbient.r, aiLight->mColorAmbient.g, aiLight->mColorAmbient.b);
+    newLight->mDiffuseColor = glm::vec3(aiLight->mColorDiffuse.r, aiLight->mColorDiffuse.g, aiLight->mColorDiffuse.b);
+    newLight->mAmbientColor = glm::vec3(aiLight->mColorSpecular.r, aiLight->mColorSpecular.g, aiLight->mColorSpecular.b);
+
+    switch (aiLight->mType)
+    {
+      case aiLightSource_POINT:
+      newLight->mType = LightType::POINT;
+    }
+
+    //replacing pointers
+    lightNode = newLight;
+    mLights.push_back(newLight);
   }
 }
 
