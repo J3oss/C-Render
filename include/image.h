@@ -4,7 +4,7 @@
 #include <vector>
 #include <color.h>
 
-enum class ImageType { DIFFUSE, NORMAL};
+enum class ImageUsage {DEFAULT, SRGB, NORMAL};
 
 class Image {
 public:
@@ -13,5 +13,5 @@ public:
   std::vector<Color> mPixels;
 
   Image() {}
-  Image(const char* path, ImageType type);
+  Image(const char* path, ImageUsage usage);
 };

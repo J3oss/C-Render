@@ -6,7 +6,7 @@
 class ImageTexture : public Texture
 {
 public:
-  ImageTexture(const char* path, ImageType type) { mImage = Image(path, type); }
+  ImageTexture(const char* path, ImageUsage usage) { mImage = Image(path, usage); }
 
   virtual Color value(float u, float v) const override
   {

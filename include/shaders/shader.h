@@ -26,7 +26,5 @@ public:
 protected:
   glm::vec2 outUVs[3];
   glm::vec3 outNormals[3];
-  glm::vec3 outTangents[3];
-  glm::vec3 outBitangents[3];
   glm::mat3 outTbnMatrix[3];
 };

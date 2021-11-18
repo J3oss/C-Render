@@ -24,25 +24,25 @@ int main()
 
   SceneManager sceneManager;
 
-  auto tableScene = new Scene("res/Table/Table.gltf");
-  std::shared_ptr<Scene> pTableScene(tableScene);
-  sceneManager.AddScene(pTableScene);
+  auto caseScene = new Scene("res/Case/Case.gltf");
+  std::shared_ptr<Scene> pCaseScene(caseScene);
+  sceneManager.AddScene(pCaseScene);
 
-  auto headwithcameraScene = new Scene("res/Head/Head.gltf");
-  std::shared_ptr<Scene> pheadwithcameraScene(headwithcameraScene);
-  sceneManager.AddScene(pheadwithcameraScene);
+  auto chairScene = new Scene("res/Chair/Chair.gltf");
+  std::shared_ptr<Scene> pChairScene(chairScene);
+  sceneManager.AddScene(pChairScene);
 
-  // auto damagedHelmetScene = new Scene("res/DamagedHelmet/DamagedHelmet.gltf");
-  // std::shared_ptr<Scene> pDamagedHelmetScene(damagedHelmetScene);
-  // sceneManager.AddScene(pDamagedHelmetScene);
+  auto hoverScene = new Scene("res/HoverCar/HoverCar.gltf");
+  std::shared_ptr<Scene> pHoverScene(hoverScene);
+  sceneManager.AddScene(pHoverScene);
 
-  // auto CesiumMilkTruckScene = new Scene("res/CesiumMilkTruck/CesiumMilkTruck.gltf");
-  // std::shared_ptr<Scene> pCesiumMilkTruckScene(CesiumMilkTruckScene);
-  // sceneManager.AddScene(pCesiumMilkTruckScene);
+  auto skullScene = new Scene("res/Skull/Skull.gltf");
+  std::shared_ptr<Scene> pSkullScene(skullScene);
+  sceneManager.AddScene(pSkullScene);
 
-  // auto cubeplaneScene = new Scene("res/Cube&Plane/Cube&Plane.gltf");
-  // std::shared_ptr<Scene> pCubePlane(cubeplaneScene);
-  // sceneManager.AddScene(pCubePlane);
+  auto damagedHelmetScene = new Scene("res/DamagedHelmet/DamagedHelmet.gltf");
+  std::shared_ptr<Scene> pDamagedHelmetScene(damagedHelmetScene);
+  sceneManager.AddScene(pDamagedHelmetScene);
 
   Renderer renderer;
   renderer.SetViewPort(0, 0);
@@ -63,6 +63,15 @@ int main()
     renderer.Clear();
     renderer.DrawScene(activeScene);
     renderer.Update();
+
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+
+    int sleepTime = (1.0f/60.0f - time_span.count()) * 1000;
+    if(sleepTime > 0) std::this_thread::sleep_for(std::chrono::milliseconds( sleepTime ));
+
+    std::cout << "FPS(before limiting):"<< 1.0/time_span.count() << std::endl;
+    bench+=1.0/time_span.count();
 
     while( SDL_PollEvent( &event ) )
     {
@@ -151,17 +160,8 @@ int main()
             break;
         }
     }
-
-    high_resolution_clock::time_point t2 = high_resolution_clock::now();
-    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-
-    int sleepTime = (1.0f/60.0f - time_span.count()) * 1000;
-    if(sleepTime > 0) std::this_thread::sleep_for(std::chrono::milliseconds( sleepTime ));
-
-    // std::cout << "FPS(before limiting):"<< 1.0/time_span.count() << std::endl;
-    // bench+=1.0/time_span.count();
   }
 
-  // printf("avg fps: %f\n", bench/1000);
+  printf("avg fps: %f\n", bench/1000);
   SDL_Quit();
 }

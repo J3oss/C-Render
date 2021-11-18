@@ -11,11 +11,11 @@
 // #include <shaders/gouraud_shader.h>
 // GouraudShader sh;
 
-#include <shaders/phong_shader.h>
-PhongShader sh;
+// #include <shaders/phong_shader.h>
+// PhongShader sh;
 
-// #include <shaders/ggshader.h>
-// FlatShader sh;
+#include <shaders/pbr_shader.h>
+PBRShader sh;
 
 #define SWAP(x,y) { glm::ivec2 temp = x; x = y; y = temp;}
 

@@ -40,7 +40,7 @@ void Window::SetPixel(uint32_t x, uint32_t y, Color c)
     printf("erro pxCoordinate out of range\n");
     return;
   }
-  _pixels[pxCoordinate] = SDL_MapRGB(_temp_surface->format, c.mColor.x, c.mColor.y, c.mColor.z);
+  _pixels[pxCoordinate] = SDL_MapRGB(_temp_surface->format, c.mColor.x*255, c.mColor.y*255, c.mColor.z*255);
 }
 
 void Window::Clear()

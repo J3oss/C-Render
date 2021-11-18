@@ -4,7 +4,7 @@
 
 #include <node.h>
 
-enum class LightType { POINT };
+enum class LightType { DIRECTIONAL, POINT };
 
 class Light : public Node
 {

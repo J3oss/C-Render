@@ -104,7 +104,7 @@ void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
     if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_DIFFUSE , 0), texPath) == AI_SUCCESS )
     {
       aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, materialIndex), texPath);
-      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::DIFFUSE);
+      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageUsage::SRGB);
       newMaterial->mAlbedoTexture = newTexture;
     }
     else
@@ -119,9 +119,17 @@ void Scene::ProcessAssimpMaterials(const aiScene* aiScene)
     if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_NORMALS , 0), texPath) == AI_SUCCESS )
     {
       aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, materialIndex), texPath);
-      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageType::NORMAL);
+      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageUsage::NORMAL);
       newMaterial->mNormalTexture = newTexture;
     }
+
+    if ( aiMaterial->Get(AI_MATKEY_TEXTURE(  aiTextureType_UNKNOWN , 0), texPath) == AI_SUCCESS )
+    {
+      aiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_UNKNOWN, materialIndex), texPath);
+      auto newTexture = std::make_shared<ImageTexture>(texPath.C_Str(), ImageUsage::DEFAULT);
+      newMaterial->mMetallicRoughness = newTexture;
+    }
+
 
     mMaterials.push_back( newMaterial );
   }
@@ -199,6 +207,10 @@ void Scene::ProcessAssimpLights(const aiScene* aiScene)
     {
       case aiLightSource_POINT:
       newLight->mType = LightType::POINT;
+      break;
+      case aiLightSource_DIRECTIONAL:
+      newLight->mType = LightType::DIRECTIONAL;
+      break;
     }
 
     //replacing pointers
